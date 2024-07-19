@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:update, :index, :destroy]
-  before_action :authorize_request, except: [:create, :login]
+  
+  before_action :authorize_request, except: [:create, :index, :login] # Para fazer qualquer ação em users é necessário estar autorizado (logado) com token, exceto nos metodos citados
+  before_action :set_user, only: [:update, :show, :destroy] # Define o usuário em questão com base no URL e o define antes de qualquer ação nos métodos citados
 
   # GET /users (Listar todos os usuários por id e username)
   def index
     users = User.select(:id, :username)
+
     render json: users
   end
 
@@ -14,10 +16,13 @@ class UsersController < ApplicationController
 
     if @user.save
       token = encode_token({ user_id: @user.id })
-      render json: { user: @user, token: token }, status: :ok
+      render json: { user: @user, token: token }, 
+      status: :ok
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @user.errors.full_messages }, 
+      status: :unprocessable_entity
     end
+
   end
 
   # POST /login (Fazer login com usuário)
@@ -28,10 +33,13 @@ class UsersController < ApplicationController
 
     if @user && @user.authenticate(user_params[:password])
       token = encode_token({ user_id: @user.id })
-      render json: { user: @user, token: token }, status: :ok
+      render json: { user: @user, token: token }, 
+      status: :ok
     else
-      render json: { error: 'Invalid username or password.' }, status: :unprocessable_entity
+      render json: { error: 'Invalid username or password.' }, 
+      status: :unprocessable_entity
     end
+
   end
 
   # GET /users/:id (Mostrar usuário por id)
@@ -41,50 +49,57 @@ class UsersController < ApplicationController
 
   # PUT /users/:id (Atualizar usuário)
   def update
+
     if @user.update(user_params)
-      render json: @user, status: :ok
+      render json: @user, 
+      status: :ok
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @user.errors.full_messages }, 
+      status: :unprocessable_entity
     end
+
   rescue StandardError => e
-    render json: { error: e.message }, status: :internal_server_error
+
+    render json: { error: e.message }, 
+    status: :internal_server_error
   end
 
   # DELETE /users/:id (Deletar usuário)
   def destroy
     @user.destroy
-    render json: { message: 'User deleted successfully' }, status: :ok
+
+    render json: { message: 'User deleted successfully' }, 
+    status: :ok
   end
 
   private
 
+  # Define o usuário a partir do ID fornecido nos parâmetros e renderiza um erro se não for encontrado
   def set_user
     @user = User.find_by(id: params[:id])
-    render json: { error: 'User not found' }, status: :not_found if @user.nil?
+
+    render json: { error: 'User not found' }, 
+    status: :not_found if @user.nil?
   end
 
+  # Permite apenas os parâmetros permitidos para criar ou atualizar um usuário
   def user_params
     params.require(:user).permit(:username, :password, :email, :cpf)
   end
 
+  # Decodifica o token JWT e define o usuário atual com base no ID do token; retorna erro se o token for inválido ou o usuário não for encontrado
   def authorize_request
-    header = request.headers['Authorization']
-    header = header.split(' ').last if header
-    begin
-      decoded = decode_token(header)
-      @current_user = User.find(decoded[:user_id])
-    rescue ActiveRecord::RecordNotFound => e
-      render json: { error: e.message }, status: :unauthorized
-    rescue JWT::DecodeError => e
-      render json: { error: e.message }, status: :unauthorized
+    decoded_token = decode_token
+
+    if decoded_token
+      @current_user = User.find_by(id: decoded_token[0]['user_id'])
+      render json: { error: 'User not found' }, 
+      status: :unauthorized if @current_user.nil?
+    else
+      render json: { error: 'Invalid token' }, 
+      status: :unauthorized
     end
+
   end
 
-  def encode_token(payload)
-    JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
-  end
-
-  def decode_token(token)
-    JWT.decode(token, Rails.application.secrets.secret_key_base, true, algorithm: 'HS256').first
-  end
 end

@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
-  resources :visits, only: [:create, :update, :index, :destroy]
-  resources :users, only: [:index, :show, :create, :update, :destroy]
+  resources :answers
+  resources :questions
+  resources :formularies
+  resources :visits
+  resources :users
   post '/login', to: 'users#login'
 
 end

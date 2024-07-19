@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
   
-  def encode_token(payload) # Autenticação via token usando a gem 'JWT'
-    JWT.encode(payload, 'secret')
+  def encode_token(payload)
+    JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
   end
 
   def decode_token
@@ -9,15 +9,17 @@ class ApplicationController < ActionController::API
     if auth_header
       token = auth_header.split(' ').last
       begin
-        JWT.decode(token, 'secret', true, algorithm: 'HS256')
+        JWT.decode(token, Rails.application.secrets.secret_key_base, true, algorithm: 'HS256')
       rescue JWT::DecodeError
-        nil 
+        nil
       end
+    else
+      nil
     end
   end
 
   def authorized_user
-    decoded_token = decode_token()
+    decoded_token = decode_token
     if decoded_token
       user_id = decoded_token[0]['user_id']
       @user = User.find_by(id: user_id)
@@ -25,8 +27,6 @@ class ApplicationController < ActionController::API
   end
 
   def authorize
-    render json: {message: 'You must be logged.'}, 
-    status: :unauthorized unless authorized_user
+    render json: { message: 'You must be logged in.' }, status: :unauthorized unless authorized_user
   end
-
 end

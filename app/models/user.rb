@@ -12,7 +12,8 @@ class User < ApplicationRecord
             presence: { message: "Password cannot be blank." }, 
             length: { minimum: 6, message: "Password must be at least 6 characters long." },
             on: :create
-  validate :password_complexity, on: :create
+  validate :password_complexity, 
+            on: :create
 
   # Validações de email e seus retornos
   validates :email, 
@@ -26,7 +27,8 @@ class User < ApplicationRecord
             presence: { message: "CPF cannot be blank." }, 
             uniqueness: { message: "This CPF is already in use." },
             on: :create
-  validate :valid_cpf, on: :create
+  validate :valid_cpf, 
+            on: :create
 
   private
 
