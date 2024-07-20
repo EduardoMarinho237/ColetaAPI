@@ -35,14 +35,18 @@ class QuestionsController < ApplicationController
     end
   end
 
-  # DELETE /questions/1
+  # DELETE /questions/1 (Deletar pergunta - soft delete)
   def destroy
-    @question.destroy!
 
-    render json: { message: 'Question deleted successfully' }, 
-    status: :ok
+    if @question.destroy
+      render json: { message: 'Question deleted successfully' }, 
+      status: :ok
+    else
+      render json: { errors: @question.errors.full_messages }, 
+      status: :unprocessable_entity
+    end
+
   end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_question

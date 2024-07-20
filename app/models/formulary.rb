@@ -1,4 +1,7 @@
 class Formulary < ApplicationRecord
+
+  acts_as_paranoid
+
   # Define associações com perguntas e respostas; se o objeto principal for excluído, as referências nas tabelas associadas são definidas como NULL.
   has_many :questions, dependent: :nullify
   has_many :answers, dependent: :nullify

@@ -43,12 +43,17 @@ class VisitsController < ApplicationController
 
   end
 
-  # DELETE /visits/1 (Deletar visita)
+  # DELETE /visits/:id (Deletar visita - soft delete)
   def destroy
-    @visit.destroy!
 
-    render json: { message: 'Visit deleted successfully' }, 
-    status: :ok
+    if @visit.destroy
+      render json: { message: 'Visit deleted successfully' }, 
+      status: :ok
+    else
+      render json: { errors: @visit.errors.full_messages }, 
+      status: :unprocessable_entity
+    end
+
   end
 
   private

@@ -64,12 +64,17 @@ class UsersController < ApplicationController
     status: :internal_server_error
   end
 
-  # DELETE /users/:id (Deletar usuário)
+  # DELETE /users/:id (Deletar usuário - soft delete)
   def destroy
-    @user.destroy
 
-    render json: { message: 'User deleted successfully' }, 
-    status: :ok
+    if @user.destroy
+      render json: { message: 'User deleted successfully' }, 
+      status: :ok
+    else
+      render json: { errors: @user.errors.full_messages }, 
+      status: :unprocessable_entity
+    end
+    
   end
 
   private

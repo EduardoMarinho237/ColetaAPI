@@ -35,12 +35,17 @@ class AnswersController < ApplicationController
     end
   end
 
-  # DELETE /answers/1
+  # DELETE /answers/1 (Deleta resposta - soft delete)
   def destroy
-    @answer.destroy!
 
-    render json: { message: 'Answer deleted successfully' }, 
-    status: :ok
+    if @answer.destroy
+      render json: { message: 'Answer deleted successfully' }, 
+      status: :ok
+    else
+      render json: { errors: @answer.errors.full_messages }, 
+      status: :unprocessable_entity
+    end
+
   end
 
   private

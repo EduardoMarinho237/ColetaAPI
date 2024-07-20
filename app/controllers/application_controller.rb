@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::API
   
+  # Metodos usados por todos os metodos que precisam de autorização para serem executados nos controllers
   def encode_token(payload)
     JWT.encode(payload, Rails.application.secrets.secret_key_base, 'HS256')
   end

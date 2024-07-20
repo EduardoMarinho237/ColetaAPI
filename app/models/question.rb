@@ -1,5 +1,7 @@
 class Question < ApplicationRecord
 
+  acts_as_paranoid
+
   belongs_to :formulary
 
   # Enum para question_type

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_20_193333) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
     t.datetime "answered_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.index ["deleted_at"], name: "index_answers_on_deleted_at"
     t.index ["formulary_id"], name: "index_answers_on_formulary_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["visit_id"], name: "index_answers_on_visit_id"
@@ -31,6 +33,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.index ["deleted_at"], name: "index_formularies_on_deleted_at"
   end
 
   create_table "questions", force: :cascade do |t|
@@ -39,6 +43,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
     t.string "question_type", default: "texto", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.index ["deleted_at"], name: "index_questions_on_deleted_at"
     t.index ["formulary_id"], name: "index_questions_on_formulary_id"
   end
 
@@ -49,6 +55,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
     t.string "cpf"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
   end
 
   create_table "visits", force: :cascade do |t|
@@ -59,6 +67,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_10_210727) do
     t.datetime "checkout_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
+    t.index ["deleted_at"], name: "index_visits_on_deleted_at"
     t.index ["user_id"], name: "index_visits_on_user_id"
   end
 

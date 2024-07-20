@@ -1,4 +1,7 @@
 class Visit < ApplicationRecord
+
+  acts_as_paranoid
+
   belongs_to :user
 
   # Enum para status disponíveis da visita

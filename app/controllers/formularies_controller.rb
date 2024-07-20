@@ -39,9 +39,17 @@ class FormulariesController < ApplicationController
     end
   end
 
-  # DELETE /formularies/1
+  # DELETE /formularies/1 (Deletar formulário - soft delete)
   def destroy
-    @formulary.destroy!
+
+    if @formulary.destroy
+      render json: { message: 'Formulary deleted successfully' }, 
+      status: :ok
+    else
+      render json: { errors: @formulary.errors.full_messages }, 
+      status: :unprocessable_entity
+    end
+
   end
 
   private
