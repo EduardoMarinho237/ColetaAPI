@@ -226,7 +226,7 @@ DEPENDENCIES
   cpf_cnpj
   debug
   jwt
-  paperclip
+  paperclip (~> 6.1)
   paranoia
   pg (~> 1.1)
   puma (>= 5.0)

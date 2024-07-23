@@ -5,9 +5,9 @@ class AnswersController < ApplicationController
 
   # GET /answers
   def index
-    answers = Answer.select(:id, :content, :question_id)
+    @answers = Answer.all
 
-    render json: answers
+    render json: @answers.map { |answer| format_answer(answer) }
   end
 
   # GET /answers/1
@@ -20,42 +20,52 @@ class AnswersController < ApplicationController
     @answer = Answer.new(answer_params)
 
     if @answer.save
-      render json: @answer, status: :created, location: @answer
+      render json: @answer, status: :created
     else
       render json: @answer.errors, status: :unprocessable_entity
     end
+
   end
 
   # PATCH/PUT /answers/1
   def update
+    
     if @answer.update(answer_params)
       render json: @answer
     else
       render json: @answer.errors, status: :unprocessable_entity
     end
+
   end
 
   # DELETE /answers/1 (Deleta resposta - soft delete)
   def destroy
 
     if @answer.destroy
-      render json: { message: 'Answer deleted successfully' }, 
-      status: :ok
+      render json: { message: 'Answer deleted successfully' }, status: :ok
     else
-      render json: { errors: @answer.errors.full_messages }, 
-      status: :unprocessable_entity
+      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_entity
     end
 
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_answer
-      @answer = Answer.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def answer_params
-      params.require(:answer).permit(:content, :formulary_id, :question_id, :visit_id, :answered_at)
-    end
+  def set_answer
+    @answer = Answer.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Answer not found' }, status: :not_found
+  end
+
+  def format_answer(answer) # Se o campo content for null, o json vai retornar o campo content_image_file_name no lugar dele em index
+    {
+      id: answer.id,
+      content: answer.content.present? ? answer.content : answer.content_image_file_name,
+      question_id: answer.question_id
+    }
+  end
+
+  def answer_params
+    params.permit(:content, :formulary_id, :question_id, :visit_id, :answered_at)
+  end  
 end

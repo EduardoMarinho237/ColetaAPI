@@ -51,7 +51,7 @@ end
 gem "paranoia"
  
 # Usado para manipular imagens
-gem "paperclip"
+gem 'paperclip', '~> 6.1'
 
 # Usado para fazer testes de validação de modelo, resposta dos controladores e testar o método de autenticação.
 # gem "rspec-rails", group: [:development, :test]
